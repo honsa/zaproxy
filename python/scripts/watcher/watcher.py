@@ -21,8 +21,7 @@
 #
 # To this script:
 # * Install the ZAP Python API: 
-#     Use ''pip install python-owasp-zap' or
-#     download from https://github.com/zaproxy/zaproxy/wiki/Downloads
+#     Use ''pip install python-owasp-zap' 
 # * Start ZAP (as this is for testing purposes you might not want the
 #     'standard' ZAP to be started)
 # * Access http://www.nottrusted.com/watcher/ via your browser, proxying through ZAP
@@ -87,7 +86,7 @@ zap = ZAP(proxies={'http': zapUrl, 'https': zapUrl})
 alerts = zap.alerts
 
 uniqueUrls = set([])
-# alertsPerUrl is a disctionary of urlsummary to a dictionary of type to set of alertshortnames ;)
+# alertsPerUrl is a dictionary of urlsummary to a dictionary of type to set of alertshortnames ;)
 alertsPerUrl = {}
 plugins = set([])
 
@@ -103,7 +102,7 @@ for alert in alerts:
 		urlSummary = urlEl[4]
 		short = abbrev.get(alert.get('alert'))
 		if (short is None):
-			print 'No abreviation for: ' + alert.get('alert')  
+			print('No abbreviation for: ' + alert.get('alert'))  
 			short = alert.get('alert')
 		aDict = alertsPerUrl.get(urlSummary, {'pass' : set([]), 'fail' : set([]), 'other' : set([])})
 		added = False
@@ -121,10 +120,10 @@ for alert in alerts:
 #for key, value in alertsPerUrl.iteritems():
 #	print key, value
 
-print "Alerts found"
-print "------------"
+print("Alerts found")
+print("------------")
 for plugin in plugins:
-	print plugin
+	print(plugin)
 
 # Generate report file
 reportFile = open('report.html', 'w')
@@ -139,7 +138,7 @@ totalPass = 0
 totalFail = 0
 total = 0
 
-for key, value in sorted(alertsPerUrl.iteritems()):
+for key, value in sorted(alertsPerUrl.items()):
 	if (len(value.get('pass')) > 0):
 		totalPass += 1
 	else:
@@ -166,7 +165,7 @@ reportFile.write("<h3>Detailed Results</h3>\n")
 reportFile.write("<table border=\"1\">\n")
 reportFile.write("<tr><th>Page</th><th>Result</th><th>Pass</th><th>Fail</th><th>Other</th>\n")
 
-for key, value in sorted(alertsPerUrl.iteritems()):
+for key, value in sorted(alertsPerUrl.items()):
 	reportFile.write("<tr>")
 	reportFile.write("<td>" + key + "</td>")
 	reportFile.write("<td>")
@@ -191,7 +190,7 @@ reportFile.write("<table border=\"1\">\n")
 reportFile.write("<tr><th>Alert</th><th>Description</th>\n")
 
 #for key, value in abbrev.items():
-for (k, v) in sorted(abbrev.items(), key=lambda (k,v): v):
+for (k, v) in sorted(list(abbrev.items()), key=lambda k_v: k_v[1]):
 	reportFile.write("<tr>")
 	reportFile.write("<td>" + v + "</td>")
 	reportFile.write("<td>" + k + "</td>")
@@ -207,7 +206,7 @@ reportFile.close()
 
 #print ''	
 	
-print ''	
-print 'Got ' + str(len(alerts)) + ' alerts'
-print 'Got ' + str(len(uniqueUrls)) + ' unique urls'
+print('')	
+print('Got ' + str(len(alerts)) + ' alerts')
+print('Got ' + str(len(uniqueUrls)) + ' unique urls')
 

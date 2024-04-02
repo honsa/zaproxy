@@ -22,12 +22,11 @@
 #
 # To this script:
 # * Install the ZAP Python API: 
-#     Use 'pip install python-owasp-zap-v2' or
-#     download from https://github.com/zaproxy/zaproxy/wiki/Downloads
+#     Use 'pip install python-owasp-zap-v2'
 # * Start ZAP (as this is for testing purposes you might not want the
 #     'standard' ZAP to be started)
 # * Access wavsep via your browser, proxying through ZAP
-# * Vist all of the wavsep top level URLs, eg
+# * Vist all of the wavsep top level URLs, e.g.
 #     http://localhost:8080/wavsep/index-active.jsp
 #     http://localhost:8080/wavsep/index-passive.jsp
 # * Run the Spider against http://localhost:8080
@@ -51,7 +50,7 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"h:p:")
 	except getopt.GetoptError:
-		print 'wavsep.py -h <ZAPhost> -p <ZAPport>'
+		print('wavsep.py -h <ZAPhost> -p <ZAPport>')
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
@@ -224,7 +223,7 @@ def main(argv):
 
 
 	uniqueUrls = set([])
-	# alertsPerUrl is a disctionary of urlsummary to a dictionary of type to set of alertshortnames ;)
+	# alertsPerUrl is a dictionary of urlsummary to a dictionary of type to set of alertshortnames ;)
 	alertsPerUrl = {}
 	plugins = set([])
 
@@ -251,7 +250,7 @@ def main(argv):
 			if (len(urlEl) > 6):
 				#print 'URL 4:' + urlEl[4] + ' 6:' + urlEl[6].split('-')[0]
 				if (urlEl[3] != 'wavsep'):
-					print 'Ignoring non wavsep URL 4:' + urlEl[4] + ' URL 5:' + urlEl[5]  + ' URL 6:' + urlEl[6]
+					print('Ignoring non wavsep URL 4:' + urlEl[4] + ' URL 5:' + urlEl[5]  + ' URL 6:' + urlEl[6])
 					continue
 				
 				if (urlEl[6].split('-')[0][:9] == 'index.jsp'):
@@ -270,7 +269,7 @@ def main(argv):
 				short = abbrev.get(alert.get('alert'))
 				if (short is None):
 					short = 'UNKNOWN'
-					print 'Unknown alert: ' + alert.get('alert')
+					print('Unknown alert: ' + alert.get('alert'))
 				aDict = alertsPerUrl.get(urlSummary, {'pass' : set([]), 'fail' : set([]), 'ignore' : set([]), 'other' : set([])})
 				added = False
 				for rule in rules:
@@ -307,7 +306,7 @@ def main(argv):
 	reportFile.write("  </head>\n")
 	reportFile.write("<body>\n")
 
-	reportFile.write("<h1><img src=\"https://raw.githubusercontent.com/zaproxy/zaproxy/develop/src/resource/zap64x64.png\" align=\"middle\">OWASP ZAP wavsep results</h1>\n")
+	reportFile.write("<h1><img src=\"https://raw.githubusercontent.com/zaproxy/zaproxy/main/zap/src/main/resources/resource/zap64x64.png\" align=\"middle\">OWASP ZAP wavsep results</h1>\n")
 	reportFile.write("Generated: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + "\n")
 
 	topResults = []
@@ -319,7 +318,7 @@ def main(argv):
 	totalFail = 0
 
 	# Calculate the top level scores
-	for key, value in sorted(alertsPerUrl.iteritems()):
+	for key, value in sorted(alertsPerUrl.items()):
 		top = key.split(' : ')[1]
 		if ('-' in top):
 			top = top.split('-')[0] + '-' + top.split('-')[1]
@@ -337,7 +336,7 @@ def main(argv):
 			thisTop[2] += 1
 		
 	# Calculate the group scores
-	for key, value in sorted(alertsPerUrl.iteritems()):
+	for key, value in sorted(alertsPerUrl.items()):
 		group = key.split(' : ')[1]
 		if (group != thisGroup[0]):
 			thisGroup = [group, 0, 0]	# group, pass, fail
@@ -405,7 +404,7 @@ def main(argv):
 	reportFile.write("<tr><th>Alert</th><th>Description</th><th>Pass</th><th>Fail</th><th>Ignore</th><th>Other</th></tr>\n")
 
 	#for key, value in abbrev.items():
-	for (k, v) in sorted(abbrev.items(), key=lambda (k,v): v):
+	for (k, v) in sorted(list(abbrev.items()), key=lambda k_v: k_v[1]):
 		reportFile.write("<tr>")
 		reportFile.write("<td>" + v + "</td>")
 		reportFile.write("<td>" + k + "</td>")
@@ -450,7 +449,7 @@ def main(argv):
 	reportFile.write("<table border=\"1\">\n")
 	reportFile.write("<tr><th>Page</th><th>Result</th><th>Pass</th><th>Fail</th><th>Ignore</th><th>Other</th></tr>\n")
 
-	for key, value in sorted(alertsPerUrl.iteritems()):
+	for key, value in sorted(alertsPerUrl.items()):
 		reportFile.write("<tr>")
 		keyArray = key.split(':')
 		if (len(keyArray) == 4):
@@ -564,11 +563,11 @@ def main(argv):
 
 	#print ''	
 	
-	print ''	
-	print 'Got ' + str(totalAlerts) + ' alerts'
-	print 'Got ' + str(len(uniqueUrls)) + ' unique urls'
-	print 'Took ' + time
-	print 'Score ' + str(total)
+	print('')	
+	print('Got ' + str(totalAlerts) + ' alerts')
+	print('Got ' + str(len(uniqueUrls)) + ' unique urls')
+	print('Took ' + time)
+	print('Score ' + str(total))
 
 if __name__ == "__main__":
 	main(sys.argv[1:])   

@@ -71,6 +71,7 @@ import org.parosproxy.paros.view.View;
 import org.zaproxy.zap.control.ExtensionFactory;
 import org.zaproxy.zap.extension.script.ScriptsCache.Configuration;
 import org.zaproxy.zap.utils.Stats;
+import org.zaproxy.zap.utils.ThreadUtils;
 
 public class ExtensionScript extends ExtensionAdaptor implements CommandLineListener {
 
@@ -176,9 +177,6 @@ public class ExtensionScript extends ExtensionAdaptor implements CommandLineList
         ScriptEngine se = mgr.getEngineByName("ECMAScript");
         if (se != null) {
             this.registerScriptEngineWrapper(new JavascriptEngineWrapper(se.getFactory()));
-        } else {
-            LOGGER.warn(
-                    "No default JavaScript/ECMAScript engine found, some scripts might no longer work.");
         }
     }
 
@@ -460,7 +458,7 @@ public class ExtensionScript extends ExtensionAdaptor implements CommandLineList
                         removeTemplate(scriptWrapper);
                     } else {
                         scriptWrapper.setEngine(null);
-                        this.getTreeModel().nodeStructureChanged(scriptWrapper);
+                        nodeStructureChanged(scriptWrapper);
                     }
                 }
             }
@@ -1823,11 +1821,12 @@ public class ExtensionScript extends ExtensionAdaptor implements CommandLineList
         if (node != null) {
             if (node.getNodeName().equals(script.getName())) {
                 // The name is the same
-                this.getTreeModel().nodeStructureChanged(script);
+                nodeStructureChanged(script);
             } else {
                 // The name has changed
                 node.setNodeName(script.getName());
-                this.getTreeModel().nodeStructureChanged(node.getParent());
+                ThreadUtils.invokeAndWaitHandled(
+                        () -> getTreeModel().nodeStructureChanged(node.getParent()));
             }
         }
 
@@ -1862,9 +1861,13 @@ public class ExtensionScript extends ExtensionAdaptor implements CommandLineList
 
         script.setEnabled(enabled);
         getScriptParam().saveScriptProperties(script);
-        this.getTreeModel().nodeStructureChanged(script);
+        nodeStructureChanged(script);
 
         notifyScriptChanged(script);
+    }
+
+    private void nodeStructureChanged(ScriptWrapper script) {
+        ThreadUtils.invokeAndWaitHandled(() -> getTreeModel().nodeStructureChanged(script));
     }
 
     public void setError(ScriptWrapper script, String details) {
@@ -1872,7 +1875,7 @@ public class ExtensionScript extends ExtensionAdaptor implements CommandLineList
         script.setLastErrorDetails(details);
         script.setLastOutput(details);
 
-        this.getTreeModel().nodeStructureChanged(script);
+        nodeStructureChanged(script);
 
         for (ScriptEventListener listener : this.listeners) {
             try {
